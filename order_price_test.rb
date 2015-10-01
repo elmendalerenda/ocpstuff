@@ -1,4 +1,4 @@
-require "minitest/autorun"
+require 'minitest/autorun'
 require './order_price'
 
 class OrderPriceTest < Minitest::Test
@@ -10,5 +10,17 @@ class OrderPriceTest < Minitest::Test
     total = OrderPrice.new([item_one, item_two]).calculate
 
     assert_equal(57.98, total.amount.round(2))
+  end
+
+  def test_adds_the_shipping_fees
+    item = Item.new('Google Chromecast', Money.new(37.99, 'USD'))
+
+    @shipping_fees = MiniTest::Mock.new
+    @shipping_fees.expect :to, 10.00
+
+    total = OrderPrice.new([item], @shipping_fees).calculate
+    assert_equal(47.99, total.amount.round(2))
+
+    @shipping_fees.verify
   end
 end

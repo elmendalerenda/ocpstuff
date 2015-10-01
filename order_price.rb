@@ -1,5 +1,5 @@
 class OrderPrice
-  def initialize(items)
+  def initialize(items, shipping_fees=nil)
     @items = Items.new(items)
   end
 
