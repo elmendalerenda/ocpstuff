@@ -16,9 +16,10 @@ class OrderPriceTest < Minitest::Test
     item = Item.new('Google Chromecast', Money.new(37.99, 'USD'))
 
     @shipping_fees = MiniTest::Mock.new
-    @shipping_fees.expect :to, 10.00
+    @shipping_fees.expect :to, 10.00, ['CA']
+    @shipping_fees.expect :nil?, false
 
-    total = OrderPrice.new([item], @shipping_fees).calculate
+    total = OrderPrice.new([item], @shipping_fees, 'CA').calculate
     assert_equal(47.99, total.amount.round(2))
 
     @shipping_fees.verify

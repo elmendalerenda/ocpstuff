@@ -1,10 +1,17 @@
 class OrderPrice
-  def initialize(items, shipping_fees=nil)
+  def initialize(items, shipping_fees=nil, destination=nil)
     @items = Items.new(items)
+    @shipping_fees = shipping_fees
+    @destination = destination
   end
 
   def calculate
-    Money.new(@items.amount, @items.currency)
+    amount = @items.amount
+    unless (@shipping_fees.nil?)
+      amount += @shipping_fees.to(@destination)
+    end
+
+    Money.new(amount, @items.currency)
   end
 
   class Items
