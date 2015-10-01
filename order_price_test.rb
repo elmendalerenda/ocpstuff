@@ -3,25 +3,27 @@ require './order_price'
 
 class OrderPriceTest < Minitest::Test
 
-  def test_sums_the_items_prices
-    item_one = Item.new('Google Chromecast', Money.new(37.99, 'USD'))
-    item_two = Item.new('Nurse costume', Money.new(19.99, 'USD'))
+  def setup
+    @item = Item.new('Google Chromecast', Money.new(37.99, 'USD'))
+    @another_item = Item.new('Nurse costume', Money.new(19.99, 'USD'))
+    @destination = 'CA'
+    @shipping_fees = MiniTest::Mock.new
+  end
 
-    total = OrderPrice.new([item_one, item_two]).calculate
+  def test_sums_the_items_prices
+    @shipping_fees.expect :to, 0.0, [@destination]
+
+    total = OrderPrice.new([@item, @another_item], @shipping_fees, @destination).calculate
 
     assert_equal(57.98, total.amount.round(2))
   end
 
-  def test_adds_the_shipping_fees
-    item = Item.new('Google Chromecast', Money.new(37.99, 'USD'))
+  def test_applies_the_shipping_fees
+    @shipping_fees.expect :to, 10.00, [@destination]
 
-    @shipping_fees = MiniTest::Mock.new
-    @shipping_fees.expect :to, 10.00, ['CA']
-    @shipping_fees.expect :nil?, false
+    total = OrderPrice.new([@item], @shipping_fees, @destination).calculate
 
-    total = OrderPrice.new([item], @shipping_fees, 'CA').calculate
     assert_equal(47.99, total.amount.round(2))
-
     @shipping_fees.verify
   end
 end
