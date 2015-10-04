@@ -31,13 +31,14 @@ class OrderPriceTest < Minitest::Test
     @shipping_fees.expect :to, 0.00, [@destination]
     @coupons = MiniTest::Mock.new
     @coupons.expect :discount, Money.new(3.00, 'USD'), ['XMAS15']
+    @coupons.expect :nil?, false
 
     total = OrderPrice.new(
       [@item],
       @shipping_fees,
       @destination,
       @coupons,
-      'XMAS2015').calculate
+      'XMAS15').calculate
 
       assert_equal(34.99, total.amount.round(2))
     @coupons.verify

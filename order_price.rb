@@ -3,11 +3,16 @@ class OrderPrice
     @items = Items.new(items)
     @shipping_fees = shipping_fees
     @destination = destination
+    @coupons = coupons
+    @coupon_code = coupon_code
   end
 
   def calculate
     amount = @items.amount
     amount = add_shipping_fees(amount)
+    unless (@coupons.nil?)
+      amount -= @coupons.discount(@coupon_code).amount
+    end
 
     Money.new(amount, @items.currency)
   end
