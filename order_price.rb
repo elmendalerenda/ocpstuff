@@ -1,5 +1,5 @@
 class OrderPrice
-  def initialize(items, shipping_fees, destination)
+  def initialize(items, shipping_fees, destination, coupons=nil, coupon_code=nil)
     @items = Items.new(items)
     @shipping_fees = shipping_fees
     @destination = destination

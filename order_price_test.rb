@@ -26,4 +26,20 @@ class OrderPriceTest < Minitest::Test
     assert_equal(47.99, total.amount.round(2))
     @shipping_fees.verify
   end
+
+  def test_applies_coupons
+    @shipping_fees.expect :to, 0.00, [@destination]
+    @coupons = MiniTest::Mock.new
+    @coupons.expect :discount, Money.new(3.00, 'USD'), ['XMAS15']
+
+    total = OrderPrice.new(
+      [@item],
+      @shipping_fees,
+      @destination,
+      @coupons,
+      'XMAS2015').calculate
+
+      assert_equal(34.99, total.amount.round(2))
+    @coupons.verify
+  end
 end
