@@ -1,5 +1,5 @@
 class OrderPrice
-  def initialize(items, shipping_fees, destination, coupons=nil, coupon_code=nil)
+  def initialize(items, shipping_fees, destination, coupons, coupon_code)
     @items = Items.new(items)
     @shipping_fees = shipping_fees
     @destination = destination
@@ -9,18 +9,20 @@ class OrderPrice
 
   def calculate
     amount = @items.amount
-    amount = add_shipping_fees(amount)
-    unless (@coupons.nil?)
-      amount -= @coupons.discount(@coupon_code).amount
-    end
+    amount = apply_shipping_fees(amount)
+    amount = apply_coupon(amount)
 
     Money.new(amount, @items.currency)
   end
 
   private
 
-  def add_shipping_fees(amount)
+  def apply_shipping_fees(amount)
     amount += @shipping_fees.to(@destination)
+  end
+
+  def apply_coupon(amount)
+    amount -= @coupons.discount(@coupon_code).amount
   end
 
   class Items
@@ -39,4 +41,12 @@ class OrderPrice
 end
 
 class Item < Struct.new(:name, :price); end
-class Money < Struct.new(:amount, :currency);end
+class Money < Struct.new(:amount, :currency)
+  def amount
+    super.round(2)
+  end
+
+  def ==(other)
+    amount == other.amount && currency == other.currency
+  end
+end
