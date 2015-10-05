@@ -1,21 +1,15 @@
 class OrderPrice
-  def initialize(items, mutators=[])
-    @items = Items.new(items)
+  def initialize(mutators)
     @mutators = AmountMutators.new(mutators)
   end
 
   def calculate
-    amount = @items.amount
-    amount = apply_mutators(amount)
+    amount = @mutators.apply
 
-    Money.new(amount, @items.currency)
+    Money.new(amount, 'USD')
   end
 
   private
-
-  def apply_mutators(amount)
-    amount + @mutators.apply
-  end
 
   class AmountMutators
     def initialize(mutators)
@@ -24,20 +18,6 @@ class OrderPrice
 
     def apply
       @mutators.reduce(0) { |acc, mutator | acc + mutator.apply }
-    end
-  end
-
-  class Items
-    def initialize(items)
-      @items = items
-    end
-
-    def amount
-      @items.reduce(0) { |acc, item| acc + item.price.amount }
-    end
-
-    def currency
-      @items.first.price.currency
     end
   end
 end
@@ -61,6 +41,16 @@ class CouponsMutator
   def initialize(coupons, coupon_code)
     @coupons = coupons
     @coupon_code = coupon_code
+  end
+end
+
+class ItemMutator
+  def apply
+    @item.price.amount
+  end
+
+  def initialize(item)
+    @item = item
   end
 end
 

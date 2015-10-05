@@ -2,15 +2,13 @@ require 'minitest/autorun'
 require './order_price'
 
 class OrderPriceTest < Minitest::Test
-  def setup
-    @item = Item.new('Google Chromecast', usd(37.99))
-  end
-
   def test_sums_the_items_prices
-    another_item = Item.new('Nurse costume', usd(19.99))
-    total = OrderPrice.new([@item, another_item]).calculate
+    item = Item.new('Nurse costume', usd(19.99))
+    item_mutator = ItemMutator.new(item)
 
-    assert_equal(usd(57.98), total)
+    total = OrderPrice.new([item_mutator]).calculate
+
+    assert_equal(usd(19.99), total)
   end
 
   def test_applies_the_shipping_fees
@@ -20,10 +18,9 @@ class OrderPriceTest < Minitest::Test
     shipping_fee_mutator = ShippingFeeMutator.new(shipping_fees, destination)
 
     total = OrderPrice.new(
-      [@item],
       [shipping_fee_mutator]).calculate
 
-    assert_equal(usd(47.99), total)
+    assert_equal(usd(10.00), total)
     shipping_fees.verify
   end
 
@@ -34,10 +31,9 @@ class OrderPriceTest < Minitest::Test
     coupons_mutator = CouponsMutator.new(coupons, coupon_code)
 
     total = OrderPrice.new(
-      [@item],
       [coupons_mutator]).calculate
 
-    assert_equal(usd(34.99), total)
+    assert_equal(usd(-3.00), total)
     coupons.verify
   end
 
