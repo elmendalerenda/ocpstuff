@@ -1,28 +1,30 @@
 class OrderPrice
-  def initialize(items, shipping_fees, destination, coupons, coupon_code)
+  def initialize(items, mutators=[])
     @items = Items.new(items)
-    @shipping_fees = shipping_fees
-    @destination = destination
-    @coupons = coupons
-    @coupon_code = coupon_code
+    @mutators = AmountMutators.new(mutators)
   end
 
   def calculate
     amount = @items.amount
-    amount = apply_shipping_fees(amount)
-    amount = apply_coupon(amount)
+    amount = apply_mutators(amount)
 
     Money.new(amount, @items.currency)
   end
 
   private
 
-  def apply_shipping_fees(amount)
-    amount += @shipping_fees.to(@destination)
+  def apply_mutators(amount)
+    amount + @mutators.apply
   end
 
-  def apply_coupon(amount)
-    amount -= @coupons.discount(@coupon_code).amount
+  class AmountMutators
+    def initialize(mutators)
+      @mutators = mutators
+    end
+
+    def apply
+      @mutators.reduce(0) { |acc, mutator | acc + mutator.apply }
+    end
   end
 
   class Items
@@ -40,7 +42,30 @@ class OrderPrice
   end
 end
 
+class ShippingFeeMutator
+  def apply
+    @shipping_fees.to(@destination).amount
+  end
+
+  def initialize(shipping_fees, destination)
+    @shipping_fees = shipping_fees
+    @destination = destination
+  end
+end
+
+class CouponsMutator
+  def apply
+    @coupons.discount(@coupon_code).amount * (-1)
+  end
+
+  def initialize(coupons, coupon_code)
+    @coupons = coupons
+    @coupon_code = coupon_code
+  end
+end
+
 class Item < Struct.new(:name, :price); end
+
 class Money < Struct.new(:amount, :currency)
   def amount
     super.round(2)
