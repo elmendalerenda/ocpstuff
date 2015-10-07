@@ -24,31 +24,35 @@ class OrderPriceTest < Minitest::Test
     shipping_fees.verify
   end
 
-  def test_applies_coupon_percentage
+  def test_applies_discount_percentage
     coupons = MiniTest::Mock.new
     coupon_code = 'XMAS15'
     coupons.expect :discount, 0.1, [coupon_code]
-    coupons_mutator = CouponsMutator.new(coupons, coupon_code)
     item = Item.new('Nurse costume', usd(19.99))
-    item_mutator = ItemMutator.new(item)
 
     total = OrderPrice.new(
-      [item_mutator, coupons_mutator]).calculate
+      [
+        ItemMutator.new(item),
+        CouponsMutator.new(coupons, coupon_code)
+      ]
+    ).calculate
 
     assert_equal(usd(17.99), total)
     coupons.verify
   end
 
-  def test_applies_coupon_percentage_at_the_end
+  def test_applies_coupon_percentage_always_at_the_end
     coupons = MiniTest::Mock.new
     coupon_code = 'XMAS15'
     coupons.expect :discount, 0.1, [coupon_code]
-    coupons_mutator = CouponsMutator.new(coupons, coupon_code)
     item = Item.new('Nurse costume', usd(19.99))
-    item_mutator = ItemMutator.new(item)
 
     total = OrderPrice.new(
-      [coupons_mutator, item_mutator]).calculate
+      [
+        CouponsMutator.new(coupons, coupon_code),
+        ItemMutator.new(item)
+      ]
+    ).calculate
 
     assert_equal(usd(17.99), total)
     coupons.verify

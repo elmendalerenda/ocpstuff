@@ -14,13 +14,22 @@ class OrderPrice
   class AmountMutators
     def initialize(mutators)
       @mutators = mutators
+      sort_mutators
     end
 
     def apply
-      m = @mutators.find {|e| e.is_a?(CouponsMutator) }
-      @mutators.delete_if {|e| e.is_a?(CouponsMutator) }
-      @mutators << m if m
       @mutators.reduce(0) { |acc, mutator | acc + mutator.apply(acc) }
+    end
+
+    private
+
+    def sort_mutators
+      is_a_last_mutator = -> (e) { e.is_a?(CouponsMutator) }
+      last_mutator = @mutators.find(&is_a_last_mutator)
+      if last_mutator
+        @mutators.delete_if(&is_a_last_mutator)
+        @mutators << last_mutator
+      end
     end
   end
 end
