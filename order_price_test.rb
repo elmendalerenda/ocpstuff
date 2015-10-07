@@ -58,6 +58,25 @@ class OrderPriceTest < Minitest::Test
     coupons.verify
   end
 
+  def test_ignore_shipping_fee_if_total_greater_than_1000
+    coupons = MiniTest::Mock.new
+    coupon_code = 'XMAS15'
+    coupons.expect :discount, 0.1, [coupon_code]
+    item = Item.new('Samsung Curved 4K 105 inches', usd(200_000.00))
+    shipping_fees = MiniTest::Mock.new
+
+    total = OrderPrice.new(
+      [
+        CouponsMutator.new(coupons, coupon_code),
+        ShippingFeeMutator.new(shipping_fees, 'CA'),
+        ItemMutator.new(item)
+      ]
+    ).calculate
+
+    assert_equal(usd(180_000.00), total)
+    coupons.verify
+  end
+
   def usd(amount)
     Money.new(amount, 'USD')
   end
