@@ -17,13 +17,16 @@ class OrderPrice
     end
 
     def apply
-      @mutators.reduce(0) { |acc, mutator | acc + mutator.apply }
+      m = @mutators.find {|e| e.is_a?(CouponsMutator) }
+      @mutators.delete_if {|e| e.is_a?(CouponsMutator) }
+      @mutators << m if m
+      @mutators.reduce(0) { |acc, mutator | acc + mutator.apply(acc) }
     end
   end
 end
 
 class ShippingFeeMutator
-  def apply
+  def apply(_)
     @shipping_fees.to(@destination).amount
   end
 
@@ -34,8 +37,8 @@ class ShippingFeeMutator
 end
 
 class CouponsMutator
-  def apply
-    @coupons.discount(@coupon_code).amount * (-1)
+  def apply(amount)
+    (amount * @coupons.discount(@coupon_code) * -1).round(2)
   end
 
   def initialize(coupons, coupon_code)
@@ -45,7 +48,7 @@ class CouponsMutator
 end
 
 class ItemMutator
-  def apply
+  def apply(_)
     @item.price.amount
   end
 
