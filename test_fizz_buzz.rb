@@ -13,6 +13,7 @@ class FizzBuzzTest < Minitest::Test
   end
 
   def fizz_buzz(number)
+    return 'Fizz' if (number % 3).zero?
     number
   end
 end
