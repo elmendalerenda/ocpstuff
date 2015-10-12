@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require './fizz_buzz'
 
 class FizzBuzzTest < Minitest::Test
 
@@ -10,11 +11,6 @@ class FizzBuzzTest < Minitest::Test
     assert_equal('Fizz', fizz_buzz(3))
     assert_equal('Fizz', fizz_buzz(6))
     assert_equal('Fizz', fizz_buzz(9))
-  end
-
-  def fizz_buzz(number)
-    return 'Fizz' if (number % 3).zero?
-    number
   end
 end
 
