@@ -2,7 +2,7 @@ def fizz_buzz(number)
   result = ''
   result = 'Fizz' if multiple_of_3(number)
   result += 'Buzz' if multiple_of_5(number)
-  result = 'Bang' if multiple_of_7(number)
+  result += 'Bang' if multiple_of_7(number)
 
   return result unless result.empty?
   number
