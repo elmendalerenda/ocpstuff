@@ -1,6 +1,9 @@
 def fizz_buzz(number)
-  return 'Fizz' if multiple_of_3(number)
-  return 'Buzz' if multiple_of_5(number)
+  result = ''
+  result = 'Fizz' if multiple_of_3(number)
+  result += 'Buzz' if multiple_of_5(number)
+
+  return result unless result.empty?
   number
 end
 
