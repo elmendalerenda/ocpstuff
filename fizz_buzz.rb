@@ -5,9 +5,13 @@ def fizz_buzz(number)
 end
 
 def multiple_of_3(number)
-  (number % 3).zero?
+  multiple_of(number, 3)
 end
 
 def multiple_of_5(number)
-  (number % 5).zero?
+  multiple_of(number, 5)
+end
+
+def multiple_of(dividend, divisor)
+  (dividend % divisor).zero?
 end
