@@ -12,5 +12,11 @@ class FizzBuzzTest < Minitest::Test
     assert_equal('Fizz', fizz_buzz(6))
     assert_equal('Fizz', fizz_buzz(9))
   end
+
+  def test_buzz_for_numbers_multiple_of_5
+    assert_equal('Buzz', fizz_buzz(5))
+    assert_equal('Buzz', fizz_buzz(10))
+    assert_equal('Buzz', fizz_buzz(20))
+  end
 end
 
